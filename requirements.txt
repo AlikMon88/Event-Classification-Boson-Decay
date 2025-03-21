@@ -1,3 +1,7 @@
 numpy
 matplotlib
 pandas
+tensorflow
+tensorflow-probability
+scipy
+scikit-learn
