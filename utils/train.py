@@ -8,9 +8,14 @@ from .model import *  # Import your model architecture
 
 epochs = 1
 
+
+''' 
+... MAIN - HYPERPARAMETER CHANGE IN HERE ... 
+'''
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def train_dnn(train, val, epochs=1, num_classes=4):
+def train_dnn(train, val, epochs=1, num_classes=3):
     """
     Function to train the DeepSet model.
     Args:
@@ -72,7 +77,7 @@ def train_dnn(train, val, epochs=1, num_classes=4):
     return history_dnn, dnn_model
 
 
-def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, num_classes=4):
+def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, num_classes=3):
     """
     Function to train the DeepSet model.
     Args:
@@ -145,7 +150,7 @@ def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, nu
     return history_deepset, deepset_model
 
 
-def train_gru(train, val, epochs=1, hidden_dim=128, num_layers=2, num_classes=4, bidirectional=True, dropout_rate=0.3):
+def train_gru(train, val, epochs=1, hidden_dim=32, num_layers=2, num_classes=3, bidirectional=True, dropout_rate=0.3):
     """
     Function to train the GRU model.
     Args:

@@ -13,8 +13,7 @@ np.random.seed(SEED)
 file_paths = {
     "Zbb": "../data/sec_c/Zbb.root",
     "Zcc": "../data/sec_c/Zcc.root",
-    "Zss": "../data/sec_c/Zss.root",
-    "Zud": "../data/sec_c/Zud.root"
+    "Zss": "../data/sec_c/Zss.root"
 }
 
 
@@ -34,7 +33,7 @@ def load_data(event_ratio=0.3):
         pd.DataFrame: A DataFrame containing the extracted features and labels.
     """
     data = []
-    labels = {"Zbb": 0, "Zcc": 1, "Zss": 2, "Zud": 3}
+    labels = {"Zbb": 0, "Zcc": 1, "Zss": 2}
     
     for label, file_path in absolute_paths.items():
         with uproot.open(file_path) as f:
@@ -69,7 +68,7 @@ def load_data(event_ratio=0.3):
     df = pd.DataFrame(data, columns=[
         "Thrust_x", "Thrust_y", "Thrust_z",
         "nParticle", "nVertex", "Vertex_chi2", "Vertex_ntracks",
-        "Vertex_chi2_mean", "Vertex_chi2_std", #"Particle_eta", "Particle_phi",
+        "Vertex_chi2_mean", "Vertex_chi2_std",
         "Particle_p", "Particle_pt",
         "label"
     ])
@@ -173,7 +172,7 @@ def load_data_generator(event_ratio=0.3, batch_size=100):
             - X_filtered: Preprocessed input data array (after sequence creation and outlier filtering).
             - y_filtered: Labels array after outlier filtering.
     """
-    labels = {"Zbb": 0, "Zcc": 1, "Zss": 2, "Zud": 3}
+    labels = {"Zbb": 0, "Zcc": 1, "Zss": 2}
     # Define which branches (features) to iterate over in the ROOT tree.
     branches = [
         "Thrust_x", "Thrust_y", "Thrust_z",

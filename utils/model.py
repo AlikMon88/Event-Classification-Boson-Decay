@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
-def dnn_classifier(input_shape, normalizer, num_classes=4):
+def dnn_classifier(input_shape, normalizer, num_classes=3):
     """
     Build a neural network model for event classification.
     Uses only event-level features from your dataset.
@@ -38,8 +38,39 @@ def dnn_classifier(input_shape, normalizer, num_classes=4):
 
 #=================================================================================================#
 
+def gru_classifier_v1(input_shape, normalizer, hidden_dim=128, num_layers=2, num_classes=3,  bidirectional=True, dropout=0.2):
+    """
+    input_shape: tuple, e.g., (seq_len, input_dim)
+    hidden_dim: number of units for GRU layers
+    num_layers: how many GRU layers
+    num_classes: output classes (e.g., 4)
+    bidirectional: whether to use bidirectional GRU layers
+    dropout: dropout rate (applied between GRU layers if num_layers > 1)
+    """
+    inputs = tf.keras.Input(shape=input_shape)  # shape = (seq_len, input_dim)
+    x = normalizer(inputs)
+    x = tf.keras.layers.Masking(mask_value=-999.0)(x)
 
-def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=125, num_classes=4, bidirectional=True, dropout=0.3, recurrent_dropout=0.2):
+    for i in range(num_layers):
+        return_seq = True if i < num_layers - 1 else False  # return full sequence except last layer
+        gru_layer = layers.GRU(hidden_dim, return_sequences=return_seq)
+        if bidirectional:
+            gru_layer = layers.Bidirectional(gru_layer)
+        x = gru_layer(x)
+        if i < num_layers - 1:
+            x = layers.Dropout(dropout)(x)
+    
+    # x now is the final output vector (batch_size, hidden_dim * (2 if bidirectional else 1))
+    outputs = layers.Dense(num_classes)(x)  # logits for each class
+    
+    model = models.Model(inputs=inputs, outputs=outputs)
+
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+
+    return model
+
+
+def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=32, num_classes=3, bidirectional=True, dropout=0.3, recurrent_dropout=0.2):
     """
     Enhanced GRU classifier with attention mechanism and residual connections.
 
@@ -121,40 +152,9 @@ def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=125, num
 
     return model
 
-def gru_classifier_v1(input_shape, normalizer, hidden_dim=128, num_layers=2, num_classes=4,  bidirectional=True, dropout=0.2):
-    """
-    input_shape: tuple, e.g., (seq_len, input_dim)
-    hidden_dim: number of units for GRU layers
-    num_layers: how many GRU layers
-    num_classes: output classes (e.g., 4)
-    bidirectional: whether to use bidirectional GRU layers
-    dropout: dropout rate (applied between GRU layers if num_layers > 1)
-    """
-    inputs = tf.keras.Input(shape=input_shape)  # shape = (seq_len, input_dim)
-    x = normalizer(inputs)
-    x = tf.keras.layers.Masking(mask_value=-999.0)(x)
-
-    for i in range(num_layers):
-        return_seq = True if i < num_layers - 1 else False  # return full sequence except last layer
-        gru_layer = layers.GRU(hidden_dim, return_sequences=return_seq)
-        if bidirectional:
-            gru_layer = layers.Bidirectional(gru_layer)
-        x = gru_layer(x)
-        if i < num_layers - 1:
-            x = layers.Dropout(dropout)(x)
-    
-    # x now is the final output vector (batch_size, hidden_dim * (2 if bidirectional else 1))
-    outputs = layers.Dense(num_classes)(x)  # logits for each class
-    
-    model = models.Model(inputs=inputs, outputs=outputs)
-
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
-
-    return model
-
 #=================================================================================================#
 
-def deepset_classifier_v1(input_shape, normalizer, hidden_dim_phi=128, hidden_dim_rho=64, num_classes=4):
+def deepset_classifier_v1(input_shape, normalizer, hidden_dim_phi=128, hidden_dim_rho=64, num_classes=3):
     """
     input_shape: tuple, e.g., (set_size, input_dim), where set_size is the number of elements per event.
     hidden_dim_phi: number of units in the φ network (applied to each element).
@@ -188,7 +188,7 @@ def deepset_classifier_v1(input_shape, normalizer, hidden_dim_phi=128, hidden_di
 
     return model
 
-def deepset_classifier_v2(input_shape, normalizer, hidden_dim_phi=256, hidden_dim_rho=128, num_classes=4, dropout_rate=0.2):
+def deepset_classifier_v2(input_shape, normalizer, hidden_dim_phi=64, hidden_dim_rho=32, num_classes=3, dropout_rate=0.2):
     """
     Enhanced DeepSets classifier for event classification.
     
