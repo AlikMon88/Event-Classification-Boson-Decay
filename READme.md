@@ -2,16 +2,21 @@
 
 This repository contains my implementation of A3 Courework.
 
+Please download the data for **Section B2** from the following link:  
+[https://mkenzie.web.cern.ch/mkenzie/mphil/assignment/2425/Bs2DsPi](https://mkenzie.web.cern.ch/mkenzie/mphil/assignment/2425/Bs2DsPi)
+
+Please download the data for **Section C2** from the following link:  
+[https://mkenzie.web.cern.ch/mkenzie/mphil/assignment/2425/FCC](https://mkenzie.web.cern.ch/mkenzie/mphil/assignment/2425/FCC)
+
 ---
 
 ## Repository Structure
 
 ```plaintext
 .
-├── data/                          # Contains the data for the problem
 |
 ├── saves/                         # Contains the saved models/plots
-|│   
+|   
 ├── report/                        # Contains the coursework report
 │   └── A3_CW.pdf
 │
