@@ -8,7 +8,6 @@ from .model import *  # Import your model architecture
 
 epochs = 1
 
-
 ''' 
 ... MAIN - HYPERPARAMETER CHANGE IN HERE ... 
 '''
@@ -31,18 +30,6 @@ def train_dnn(train, val, epochs=1, num_classes=3):
     metrics_path = os.path.join(BASE_DIR, '..', 'saves', 'metrics', 'dnn_metrics.pkl')
 
     # Set up callbacks for early stopping and learning rate reduction
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(
-            patience=5, 
-            restore_best_weights=True,
-            monitor='val_loss'
-        ),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            factor=0.5, 
-            patience=3
-        )
-    ]
-
     X_train, y_train = train
     X_val, y_val = val
 
@@ -57,13 +44,25 @@ def train_dnn(train, val, epochs=1, num_classes=3):
         normalizer=normalizer, 
     )
 
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            patience=5, 
+            restore_best_weights=True,
+            monitor='val_loss'
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            factor=0.5, 
+            patience=3
+        )
+    ]
+
     # Train the model
     history_dnn = dnn_model.fit(
         X_train, 
         y_train, 
         epochs=epochs,
         validation_data=(X_val, y_val),
-        batch_size=32,
+        batch_size=64,
         callbacks=callbacks
     )
     
@@ -93,18 +92,6 @@ def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, nu
     metrics_path = os.path.join(BASE_DIR, '..', 'saves', 'metrics', 'deepset_metrics.pkl')
     
     # Set up callbacks for early stopping and learning rate reduction
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(
-            patience=5, 
-            restore_best_weights=True,
-            monitor='val_loss'
-        ),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            factor=0.5, 
-            patience=3
-        )
-    ]
-
     X_train, y_train = train
     X_val, y_val = val
 
@@ -131,12 +118,24 @@ def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, nu
     #     normalizer=normalizer, 
     # )
     
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            patience=5, 
+            restore_best_weights=True,
+            monitor='val_loss'
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            factor=0.5, 
+            patience=3
+        )
+    ]
+
     history_deepset = deepset_model.fit(
         X_train, 
         y_train, 
         epochs=epochs,
         validation_data=(X_val, y_val),
-        batch_size=32,
+        batch_size=64,
         callbacks=callbacks
     )
     
@@ -150,7 +149,7 @@ def train_deepset(train, val, epochs=1, hidden_dim_phi=64, hidden_dim_rho=32, nu
     return history_deepset, deepset_model
 
 
-def train_gru(train, val, epochs=1, hidden_dim=32, num_layers=2, num_classes=3, bidirectional=True, dropout_rate=0.3):
+def train_gru(train, val, epochs=1, hidden_dim=32, num_layers=3, num_classes=3, bidirectional=True, dropout_rate=0.3):
     """
     Function to train the GRU model.
     Args:
@@ -168,18 +167,6 @@ def train_gru(train, val, epochs=1, hidden_dim=32, num_layers=2, num_classes=3, 
     metrics_path = os.path.abspath(os.path.join(BASE_DIR, '..', 'saves', 'metrics', 'gru_metrics.pkl'))
 
     # Set up callbacks for early stopping and learning rate reduction
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(
-            patience=5, 
-            restore_best_weights=True,
-            monitor='val_loss'
-        ),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            factor=0.5, 
-            patience=3
-        )
-    ]
-
     X_train, y_train = train
     X_val, y_val = val
 
@@ -214,13 +201,26 @@ def train_gru(train, val, epochs=1, hidden_dim=32, num_layers=2, num_classes=3, 
                       loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), 
                       metrics=['accuracy'])
 
+    
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            patience=5, 
+            restore_best_weights=True,
+            monitor='val_loss'
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            factor=0.5, 
+            patience=3
+        )
+    ]
+
     # Train the model
     history_gru = gru_model.fit(
         X_train, 
         y_train, 
         epochs=epochs,
         validation_data=(X_val, y_val),
-        batch_size=32,
+        batch_size=64,
         callbacks=callbacks
     )
     

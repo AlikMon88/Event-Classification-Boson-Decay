@@ -14,23 +14,23 @@ def dnn_classifier(input_shape, normalizer, num_classes=3):
     x = layers.Dense(64, activation='relu')(input_layer)
     x = layers.Dropout(0.2)(x)
     x = layers.Dense(128, activation='relu')(x)
-    x = layers.Dropout(0.2)(x)
+    x = layers.Dropout(0.4)(x)
     x = layers.Dense(256, activation='relu')(x)
-    x = layers.Dropout(0.2)(x)
+    x = layers.Dropout(0.4)(x)
     x = layers.Dense(128, activation='relu')(x)
     x = layers.Dropout(0.2)(x)
     x = layers.Dense(64, activation='linear')(x)
     
     # Output layer with softmax activation for multi-class classification
-    output_layer = layers.Dense(num_classes, activation='softmax', name='output')(x)
+    output_layer = layers.Dense(num_classes, activation='linear', name='output')(x)
     
     # Create the model
     model = models.Model(inputs=input_layer, outputs=output_layer)
     
     # Compile the model
     model.compile(
-        optimizer='adam',
-        loss='sparse_categorical_crossentropy', ## not one-hot encoded
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=['accuracy']
     )
     
@@ -65,12 +65,12 @@ def gru_classifier_v1(input_shape, normalizer, hidden_dim=128, num_layers=2, num
     
     model = models.Model(inputs=inputs, outputs=outputs)
 
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
 
     return model
 
 
-def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=32, num_classes=3, bidirectional=True, dropout=0.3, recurrent_dropout=0.2):
+def gru_classifier_v2(input_shape, normalizer, num_layers=3, hidden_dim=32, num_classes=3, bidirectional=True, dropout=0.3, recurrent_dropout=0.2):
     """
     Enhanced GRU classifier with attention mechanism and residual connections.
 
@@ -137,9 +137,6 @@ def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=32, num_
     weighted_sum = layers.Multiply()([x, attention_weights])       
     x = layers.Lambda(lambda z: tf.reduce_sum(z, axis=1))(weighted_sum)  # (batch, features)
     
-    # Alternatively, you could use GlobalAveragePooling1D:
-    # x = layers.GlobalAveragePooling1D()(x)
-    
     # Classification head
     x = layers.Dense(hidden_dim, activation='relu')(x)
     x = layers.BatchNormalization()(x)
@@ -148,7 +145,7 @@ def gru_classifier_v2(input_shape, normalizer, num_layers=2, hidden_dim=32, num_
     
     model = models.Model(inputs=inputs, outputs=outputs)
 
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
 
     return model
 
@@ -184,11 +181,11 @@ def deepset_classifier_v1(input_shape, normalizer, hidden_dim_phi=128, hidden_di
     
     model = models.Model(inputs=inputs, outputs=outputs)
 
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
 
     return model
 
-def deepset_classifier_v2(input_shape, normalizer, hidden_dim_phi=64, hidden_dim_rho=32, num_classes=3, dropout_rate=0.2):
+def deepset_classifier_v2(input_shape, normalizer, hidden_dim_phi=45, hidden_dim_rho=32, num_classes=3, dropout_rate=0.2):
     """
     Enhanced DeepSets classifier for event classification.
     
